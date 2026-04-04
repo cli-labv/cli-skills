@@ -1,0 +1,38 @@
+# Example 2: Status Messages with Shapes
+
+## Code
+
+```python
+from cli_banners import generate_shape
+
+# Success message
+check = generate_shape("check", style="detailed", color="green")
+print(f"{check} Build successful")
+print(f"{check} Tests passed (127/127)")
+print(f"{check} Deployment complete")
+
+# Error message
+cross = generate_shape("cross", style="detailed", color="red")
+print(f"{cross} Connection timeout")
+print(f"{cross} Invalid credentials")
+
+# Info with arrows
+arrow = generate_shape("arrow_right", style="block", color="cyan")
+print(f"\n{arrow} Next steps:")
+print(f"  1. Review logs")
+print(f"  2. Check configuration")
+```
+
+## Output
+
+```
+✅ Build successful
+✅ Tests passed (127/127)
+✅ Deployment complete
+❌ Connection timeout
+❌ Invalid credentials
+
+▶ Next steps:
+  1. Review logs
+  2. Check configuration
+```

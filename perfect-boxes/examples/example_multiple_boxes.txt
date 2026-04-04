@@ -1,0 +1,89 @@
+# Ejemplo: Múltiples Cuadros con Diferentes Estilos
+
+## Código Completo:
+
+```python
+from skills.perfect_boxes.python.perfect_box import (
+    print_perfect_box,
+    print_fancy_banner,
+    print_header
+)
+
+# Banner de bienvenida
+print_fancy_banner("🚀 MI APLICACIÓN CLI", "Versión 2.0.0", width=70, color="cyan")
+print()
+
+# Header de sección
+print_header("📋 Configuración Inicial", icon="⚙️", color="yellow")
+print("  ✓ Verificando dependencias...")
+print("  ✓ Cargando configuración...")
+print()
+
+# Cuadro de progreso
+print_perfect_box(
+    title="⏳ PROCESANDO...",
+    subtitle="Generando reportes",
+    description="Archivo 3 de 10",
+    width=60,
+    color="blue"
+)
+print()
+
+# Header de sección
+print_header("✅ Proceso Completado", icon="🎉", color="green")
+print("  • 10 archivos procesados")
+print("  • 0 errores")
+print()
+
+# Cuadro de éxito
+print_perfect_box(
+    title="✨ 🎊 ¡ÉXITO! 🎈",
+    subtitle="Todos los archivos fueron procesados correctamente",
+    description="Tiempo total: 45 segundos",
+    width=70,
+    color="green"
+)
+```
+
+## Salida Esperada:
+
+══════════════════════════════════════════════════════════════════════
+                       🚀 MI APLICACIÓN CLI                           
+                          Versión 2.0.0                               
+══════════════════════════════════════════════════════════════════════
+
+⚙️  📋 Configuración Inicial
+──────────────────────────────────────────────────
+  ✓ Verificando dependencias...
+  ✓ Cargando configuración...
+
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║                    ⏳ PROCESANDO...                       ║
+║                                                          ║
+║                   Generando reportes                     ║
+║                                                          ║
+║                     Archivo 3 de 10                      ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+
+🎉  ✅ Proceso Completado
+──────────────────────────────────────────────────
+  • 10 archivos procesados
+  • 0 errores
+
+╔════════════════════════════════════════════════════════════════════╗
+║                                                                    ║
+║                       ✨ 🎊 ¡ÉXITO! 🎈                              ║
+║                                                                    ║
+║           Todos los archivos fueron procesados correctamente       ║
+║                                                                    ║
+║                      Tiempo total: 45 segundos                     ║
+║                                                                    ║
+╚════════════════════════════════════════════════════════════════════╝
+
+## Ventajas:
+✅ Todos los cuadros perfectamente alineados
+✅ Manejo correcto de múltiples emojis
+✅ Diferentes estilos para diferentes contextos
+✅ Fácil de leer y profesional

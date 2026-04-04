@@ -1,0 +1,70 @@
+# Example 4: Deployment Script with Banners
+
+## Bash Script
+
+```bash
+#!/usr/bin/env bash
+
+source skills/cli-banners/bash/banner_generator.sh
+
+# Welcome banner
+generate_colored_banner "DEPLOYMENT SCRIPT" "cyan"
+echo ""
+
+# Step 1
+arrow=$(generate_arrow right)
+echo "$arrow Step 1: Building application"
+echo "  Compiling source..."
+sleep 1
+check=$(generate_check detailed)
+echo "  $check Build complete"
+echo ""
+
+# Step 2
+echo "$arrow Step 2: Running tests"
+echo "  Executing test suite..."
+sleep 1
+echo "  $check All tests passed (47/47)"
+echo ""
+
+# Step 3
+echo "$arrow Step 3: Deploying to production"
+echo "  Uploading files..."
+sleep 1
+echo "  Restarting services..."
+sleep 1
+echo "  $check Deployment successful"
+echo ""
+
+# Final status
+generate_box_banner "DEPLOYMENT COMPLETE" "green"
+echo ""
+echo "Application is live at https://myapp.com"
+```
+
+## Output
+
+```
+═══════════════════════
+  DEPLOYMENT SCRIPT
+═══════════════════════
+
+▶ Step 1: Building application
+  Compiling source...
+  ✅ Build complete
+
+▶ Step 2: Running tests
+  Executing test suite...
+  ✅ All tests passed (47/47)
+
+▶ Step 3: Deploying to production
+  Uploading files...
+  Restarting services...
+  ✅ Deployment successful
+
+╔═══════════════════════════╗
+║ DEPLOYMENT COMPLETE       ║
+╚═══════════════════════════╝
+
+Application is live at https://myapp.com
+```

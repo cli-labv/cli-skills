@@ -1,0 +1,78 @@
+# Ejemplo con Emojis: El Caso Problemático
+
+## El Problema Original:
+
+Cuando usas `len()` en Python o `${#string}` en Bash, los emojis se cuentan como 1 carácter:
+
+```python
+text = "📸 DIRTOPDF CLI 📄"
+print(len(text))  # Output: 17 (¡INCORRECTO para terminal!)
+
+# Pero el terminal renderiza:
+# 📸 = 2 celdas
+# 📄 = 2 celdas
+# Total visual = 19 celdas (no 17)
+```
+
+Entonces si calculas padding así:
+```python
+padding = total_width - len(text)  # ❌ Asume 17 celdas
+```
+
+El cuadro queda desalineado:
+
+```
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║  📸 DIRTOPDF CLI 📄                                       ║  ← ¡Desalineado!
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+```
+
+---
+
+## La Solución: Perfect Boxes Skill
+
+```python
+from skills.perfect_boxes.python.perfect_box import print_perfect_box
+
+print_perfect_box(
+    title="📸 DIRTOPDF CLI 📄",
+    subtitle="Convierte Carpetas de Imágenes en PDFs",
+    description="Versión 1.0.0",
+    width=62,
+    color="cyan"
+)
+```
+
+## Salida Correcta:
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║              📸 DIRTOPDF CLI 📄                            ║
+║                                                            ║
+║        Convierte Carpetas de Imágenes en PDFs              ║
+║                                                            ║
+║                      Versión 1.0.0                         ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+
+## ¿Cómo lo hace?
+
+La skill usa `get_visual_width()` que calcula:
+- "📸" = 2 celdas (emoji)
+- " " = 1 celda (espacio)
+- "D" = 1 celda (ASCII)
+- "📄" = 2 celdas (emoji)
+
+Total: 2 + 1 + 13 + 1 + 2 = 19 celdas visuales
+
+Entonces ajusta el padding:
+```python
+visual_width = 19  # Ancho real en terminal
+padding_left = (60 - 19) // 2 = 20
+padding_right = 60 - 19 - 20 = 21
+
+# Resultado: 20 espacios + texto + 21 espacios = 60 celdas perfectas
+```
+
+¡El cuadro cierra perfectamente! ✅

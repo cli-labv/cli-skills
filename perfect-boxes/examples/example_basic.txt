@@ -1,0 +1,30 @@
+# Ejemplo Básico: Cuadro sin Emojis
+
+## Código:
+```python
+from skills.perfect_boxes.python.perfect_box import print_perfect_box
+
+print_perfect_box(
+    title="SISTEMA DE BACKUP",
+    subtitle="Copia de seguridad automatica",
+    description="Server: production-01",
+    width=60,
+    color="cyan"
+)
+```
+
+## Salida Esperada:
+╔══════════════════════════════════════════════════════════╗
+║                                                          ║
+║                   SISTEMA DE BACKUP                      ║
+║                                                          ║
+║              Copia de seguridad automatica               ║
+║                                                          ║
+║                  Server: production-01                   ║
+║                                                          ║
+╚══════════════════════════════════════════════════════════╝
+
+## Notas:
+- Todos los caracteres son ASCII estándar (ancho = 1 celda)
+- El cuadro se cierra perfectamente en ambos lados
+- El texto está perfectamente centrado

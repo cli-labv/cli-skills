@@ -1,0 +1,59 @@
+# Example 3: Application Welcome Screen
+
+## Code
+
+```python
+from cli_banners import generate_text, generate_shape
+from skills.perfect_boxes.python.perfect_box import print_perfect_box
+
+# App title
+title = generate_text("MYAPP", style="block", color="cyan")
+print(title)
+
+# Version info
+star = generate_shape("star", style="block", color="yellow")
+print(f"\n{star} Version 2.0.0 - Production Ready\n")
+
+# Menu
+arrow = generate_shape("arrow_right", style="block")
+print("Main Menu:")
+print(f"  {arrow} Start Application")
+print(f"  {arrow} View Settings")
+print(f"  {arrow} Run Tests")
+print(f"  {arrow} Exit")
+
+# Status box
+check = generate_shape("check", style="detailed", color="green")
+print_perfect_box(
+    f"{check} System Ready",
+    "All services are running",
+    width=50
+)
+```
+
+## Output
+
+```
+ ███╗   ███╗  ██╗   ██╗   █████╗   ██████╗   ██████╗  
+ ████╗ ████║  ╚██╗ ██╔╝  ██╔══██╗  ██╔══██╗  ██╔══██╗ 
+ ██╔████╔██║   ╚████╔╝   ███████║  ██████╔╝  ██████╔╝ 
+ ██║╚██╔╝██║    ╚██╔╝    ██╔══██║  ██╔═══╝   ██╔═══╝  
+ ██║ ╚═╝ ██║     ██║     ██║  ██║  ██║       ██║      
+ ╚═╝     ╚═╝     ╚═╝     ╚═╝  ╚═╝  ╚═╝       ╚═╝      
+
+★ Version 2.0.0 - Production Ready
+
+Main Menu:
+  ▶ Start Application
+  ▶ View Settings
+  ▶ Run Tests
+  ▶ Exit
+
+╔════════════════════════════════════════════════╗
+║                                                ║
+║              ✅ System Ready                   ║
+║                                                ║
+║          All services are running              ║
+║                                                ║
+╚════════════════════════════════════════════════╝
+```
