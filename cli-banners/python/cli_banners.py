@@ -2,10 +2,37 @@
 """
 cli_banners.py - Professional ASCII art and banner generator
 Generates high-quality CLI banners without external dependencies
+
+For complete alphabet with multiple styles, see: alphabet.py
+    - BLOCK: Bold block letters (6 lines)
+    - SLIM: Thinner letters (5 lines)
+    - MINI: Compact letters (3 lines)
+    - SIMPLE: Pure ASCII (no unicode)
+
+Usage:
+    from cli_banners import generate_text, generate_shape
+    
+    # Using built-in fonts
+    banner = generate_text("HELLO", style="block", color="cyan")
+    
+    # Using extended alphabet (more styles)
+    from alphabet import render_text, ALPHABET
+    banner = render_text("HELLO WORLD", style="mini", color="green")
 """
 
 import sys
 from typing import Optional, Dict, List, Tuple
+
+# Try to import extended alphabet
+try:
+    from .alphabet import ALPHABET, render_text as render_extended, STYLE_INFO
+    HAS_EXTENDED = True
+except ImportError:
+    try:
+        from alphabet import ALPHABET, render_text as render_extended, STYLE_INFO
+        HAS_EXTENDED = True
+    except ImportError:
+        HAS_EXTENDED = False
 
 # ANSI color codes
 class Colors:
@@ -31,278 +58,12 @@ class Colors:
     BRIGHT_WHITE = '\033[97m'
 
 
-# Font definitions (character matrices)
-# Each character is represented as a list of strings (lines)
+# =============================================================================
+# FONTS - Now use alphabet.py for complete character sets
+# Minimal fallback fonts kept for backwards compatibility when alphabet.py unavailable
+# =============================================================================
 
-FONT_BLOCK = {
-    'A': [
-        '  █████╗ ',
-        ' ██╔══██╗',
-        ' ███████║',
-        ' ██╔══██║',
-        ' ██║  ██║',
-        ' ╚═╝  ╚═╝'
-    ],
-    'B': [
-        ' ██████╗ ',
-        ' ██╔══██╗',
-        ' ██████╔╝',
-        ' ██╔══██╗',
-        ' ██████╔╝',
-        ' ╚═════╝ '
-    ],
-    'C': [
-        '  ██████╗',
-        ' ██╔════╝',
-        ' ██║     ',
-        ' ██║     ',
-        ' ╚██████╗',
-        '  ╚═════╝'
-    ],
-    'D': [
-        ' ██████╗ ',
-        ' ██╔══██╗',
-        ' ██║  ██║',
-        ' ██║  ██║',
-        ' ██████╔╝',
-        ' ╚═════╝ '
-    ],
-    'E': [
-        ' ███████╗',
-        ' ██╔════╝',
-        ' █████╗  ',
-        ' ██╔══╝  ',
-        ' ███████╗',
-        ' ╚══════╝'
-    ],
-    'F': [
-        ' ███████╗',
-        ' ██╔════╝',
-        ' █████╗  ',
-        ' ██╔══╝  ',
-        ' ██║     ',
-        ' ╚═╝     '
-    ],
-    'G': [
-        '  ██████╗ ',
-        ' ██╔════╝ ',
-        ' ██║  ███╗',
-        ' ██║   ██║',
-        ' ╚██████╔╝',
-        '  ╚═════╝ '
-    ],
-    'H': [
-        ' ██╗  ██╗',
-        ' ██║  ██║',
-        ' ███████║',
-        ' ██╔══██║',
-        ' ██║  ██║',
-        ' ╚═╝  ╚═╝'
-    ],
-    'I': [
-        ' ██╗',
-        ' ██║',
-        ' ██║',
-        ' ██║',
-        ' ██║',
-        ' ╚═╝'
-    ],
-    'J': [
-        '      ██╗',
-        '      ██║',
-        '      ██║',
-        ' ██   ██║',
-        ' ╚█████╔╝',
-        '  ╚════╝ '
-    ],
-    'K': [
-        ' ██╗  ██╗',
-        ' ██║ ██╔╝',
-        ' █████╔╝ ',
-        ' ██╔═██╗ ',
-        ' ██║  ██╗',
-        ' ╚═╝  ╚═╝'
-    ],
-    'L': [
-        ' ██╗     ',
-        ' ██║     ',
-        ' ██║     ',
-        ' ██║     ',
-        ' ███████╗',
-        ' ╚══════╝'
-    ],
-    'M': [
-        ' ███╗   ███╗',
-        ' ████╗ ████║',
-        ' ██╔████╔██║',
-        ' ██║╚██╔╝██║',
-        ' ██║ ╚═╝ ██║',
-        ' ╚═╝     ╚═╝'
-    ],
-    'N': [
-        ' ███╗   ██╗',
-        ' ████╗  ██║',
-        ' ██╔██╗ ██║',
-        ' ██║╚██╗██║',
-        ' ██║ ╚████║',
-        ' ╚═╝  ╚═══╝'
-    ],
-    'O': [
-        '  ██████╗ ',
-        ' ██╔═══██╗',
-        ' ██║   ██║',
-        ' ██║   ██║',
-        ' ╚██████╔╝',
-        '  ╚═════╝ '
-    ],
-    'P': [
-        ' ██████╗ ',
-        ' ██╔══██╗',
-        ' ██████╔╝',
-        ' ██╔═══╝ ',
-        ' ██║     ',
-        ' ╚═╝     '
-    ],
-    'Q': [
-        '  ██████╗ ',
-        ' ██╔═══██╗',
-        ' ██║   ██║',
-        ' ██║▄▄ ██║',
-        ' ╚██████╔╝',
-        '  ╚══▀▀═╝ '
-    ],
-    'R': [
-        ' ██████╗ ',
-        ' ██╔══██╗',
-        ' ██████╔╝',
-        ' ██╔══██╗',
-        ' ██║  ██║',
-        ' ╚═╝  ╚═╝'
-    ],
-    'S': [
-        ' ███████╗',
-        ' ██╔════╝',
-        ' ███████╗',
-        ' ╚════██║',
-        ' ███████║',
-        ' ╚══════╝'
-    ],
-    'T': [
-        ' ████████╗',
-        ' ╚══██╔══╝',
-        '    ██║   ',
-        '    ██║   ',
-        '    ██║   ',
-        '    ╚═╝   '
-    ],
-    'U': [
-        ' ██╗   ██╗',
-        ' ██║   ██║',
-        ' ██║   ██║',
-        ' ██║   ██║',
-        ' ╚██████╔╝',
-        '  ╚═════╝ '
-    ],
-    'V': [
-        ' ██╗   ██╗',
-        ' ██║   ██║',
-        ' ██║   ██║',
-        ' ╚██╗ ██╔╝',
-        '  ╚████╔╝ ',
-        '   ╚═══╝  '
-    ],
-    'W': [
-        ' ██╗    ██╗',
-        ' ██║    ██║',
-        ' ██║ █╗ ██║',
-        ' ██║███╗██║',
-        ' ╚███╔███╔╝',
-        '  ╚══╝╚══╝ '
-    ],
-    'X': [
-        ' ██╗  ██╗',
-        ' ╚██╗██╔╝',
-        '  ╚███╔╝ ',
-        '  ██╔██╗ ',
-        ' ██╔╝ ██╗',
-        ' ╚═╝  ╚═╝'
-    ],
-    'Y': [
-        ' ██╗   ██╗',
-        ' ╚██╗ ██╔╝',
-        '  ╚████╔╝ ',
-        '   ╚██╔╝  ',
-        '    ██║   ',
-        '    ╚═╝   '
-    ],
-    'Z': [
-        ' ███████╗',
-        ' ╚══███╔╝',
-        '   ███╔╝ ',
-        '  ███╔╝  ',
-        ' ███████╗',
-        ' ╚══════╝'
-    ],
-    '0': [
-        '  ██████╗ ',
-        ' ██╔══██╗',
-        ' ██║  ██║',
-        ' ██║  ██║',
-        ' ╚█████╔╝',
-        '  ╚════╝ '
-    ],
-    '1': [
-        ' ██╗',
-        '███║',
-        '╚██║',
-        ' ██║',
-        ' ██║',
-        ' ╚═╝'
-    ],
-    '2': [
-        ' ██████╗ ',
-        '██╔════╝ ',
-        '███████╗ ',
-        '╚════██║ ',
-        '██████╔╝ ',
-        '╚═════╝  '
-    ],
-    '3': [
-        ' ██████╗ ',
-        '██╔═══██╗',
-        '╚════██╔╝',
-        ' █████╔╝ ',
-        ' ╚═══██╗ ',
-        ' █████╔╝ ',
-        ' ╚════╝  '
-    ],
-    ' ': [
-        '   ',
-        '   ',
-        '   ',
-        '   ',
-        '   ',
-        '   '
-    ],
-    '!': [
-        ' ██╗',
-        ' ██║',
-        ' ██║',
-        ' ╚═╝',
-        ' ██╗',
-        ' ╚═╝'
-    ],
-    '?': [
-        ' ██████╗ ',
-        '██╔═══██╗',
-        '╚═══███╔╝',
-        '   ███╔╝ ',
-        '   ╚═╝   ',
-        '   ██╗   ',
-        '   ╚═╝   '
-    ],
-}
-
+# Minimal fallback font (only used when alphabet.py is not available)
 FONT_MINIMAL = {
     'A': ['┌─┐', '├─┤', '┴ ┴'],
     'B': ['┌┐ ', '├┴┐', '└─┘'],
@@ -434,22 +195,31 @@ def generate_text(
     
     Args:
         text: Text to convert
-        style: "block" or "minimal"
-        color: Optional ANSI color name
+        style: Font style:
+            - "block": Bold block letters (6 lines) - default
+            - "minimal": Minimal box-drawing (3 lines) - fallback
+            - "slim": Thinner block letters (5 lines) - requires alphabet.py
+            - "mini": Compact letters (3 lines) - requires alphabet.py
+            - "simple": Pure ASCII (5 lines) - requires alphabet.py
+        color: Optional ANSI color name (red, green, yellow, blue, cyan, etc.)
         width: Optional max width (not yet implemented)
         
     Returns:
         ASCII art as string
+    
+    Example:
+        >>> print(generate_text("HELLO", style="block", color="cyan"))
     """
+    # Use extended alphabet for all styles when available
+    if HAS_EXTENDED:
+        if style in ('slim', 'mini', 'simple', 'block'):
+            return render_extended(text, style=style, color=color)
+    
     text = text.upper()
     
-    # Select font
-    if style == 'minimal':
-        font = FONT_MINIMAL
-        height = 3
-    else:  # block
-        font = FONT_BLOCK
-        height = 6
+    # Fallback to minimal font when alphabet.py not available
+    font = FONT_MINIMAL
+    height = 3
     
     # Build the output
     lines = ['' for _ in range(height)]
@@ -520,7 +290,19 @@ def generate_shape(
 
 def get_available_styles() -> List[str]:
     """Return list of available text styles."""
-    return ['block', 'minimal']
+    styles = ['block', 'minimal']
+    if HAS_EXTENDED:
+        styles.extend(['slim', 'mini', 'simple'])
+    return styles
+
+
+def get_available_characters(style: str = 'block') -> List[str]:
+    """Return list of available characters for a style."""
+    if HAS_EXTENDED and style in ALPHABET:
+        return sorted(ALPHABET[style].keys())
+    
+    # Fallback to minimal font
+    return sorted(FONT_MINIMAL.keys())
 
 
 def get_available_shapes() -> List[str]:
@@ -567,6 +349,26 @@ def demo():
         symbol = generate_shape(shape, style='block')
         print(f"  • {shape}: {symbol}")
     print()
+    
+    # Demo 6: Extended alphabet styles (if available)
+    if HAS_EXTENDED:
+        print("6. Extended Alphabet Styles:")
+        print("\n   SLIM style:")
+        print(generate_text("ABC", style="slim", color="yellow"))
+        print("\n   MINI style:")
+        print(generate_text("XYZ", style="mini", color="magenta"))
+        print("\n   SIMPLE style (pure ASCII):")
+        print(generate_text("123", style="simple"))
+        print()
+        
+        print("7. Available styles:", get_available_styles())
+        print()
+    
+    # Demo: Available characters
+    print("8. Available characters in 'block' style:")
+    chars = get_available_characters('block')
+    print(f"   {' '.join(chars[:26])}")
+    print(f"   {' '.join(chars[26:])}")
 
 
 if __name__ == "__main__":

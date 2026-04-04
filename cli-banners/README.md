@@ -34,10 +34,17 @@ TTTTT EEEEE SSSSS TTTTT
 ## Características
 
 ### 🎨 Generación de Texto
-- **Estilo Block**: Caracteres sólidos tipo FIGLET
-- **Estilo Box**: Caracteres con bordes Unicode
-- **Estilo Slant**: Texto inclinado elegante
-- **Estilo Shadow**: Con efecto de sombra
+- **Estilo Block**: Caracteres sólidos tipo FIGLET (6 líneas)
+- **Estilo Slim**: Letras más delgadas (5 líneas)
+- **Estilo Mini**: Compacto (3 líneas)
+- **Estilo Simple**: ASCII puro sin unicode (5 líneas)
+- **Estilo Minimal**: Caracteres de caja unicode (3 líneas)
+
+### 🔤 Alfabeto Completo (alphabet.py)
+- **A-Z completo** en todos los estilos
+- **0-9 números** 
+- **Símbolos**: ! ? . , : - _ / @ # + = * ( ) [ ] < > & % $ ' "
+- Fácil de extender con nuevos caracteres
 
 ### 🖼️ Generación de Shapes
 - **Formas geométricas**: Círculos, rectángulos, triángulos
@@ -45,10 +52,11 @@ TTTTT EEEEE SSSSS TTTTT
 - **Figuras simples**: Estrellas, corazones, etc.
 
 ### 🎯 Estilos Configurables
-- `block`: Bloques sólidos █
-- `shaded`: Con sombreado ░▒▓█
-- `minimal`: Limpio y espaciado
-- `detailed`: Refinado con detalles
+- `block`: Bloques sólidos █ (6 líneas, el más legible)
+- `slim`: Más delgado ▄▀ (5 líneas)
+- `mini`: Compacto ▄█▀ (3 líneas, ideal para espacios reducidos)
+- `simple`: ASCII puro /\-| (5 líneas, máxima compatibilidad)
+- `minimal`: Box-drawing ┌┐└┘ (3 líneas)
 
 ### 🌈 Soporte de Colores
 - Colores ANSI estándar
@@ -57,7 +65,7 @@ TTTTT EEEEE SSSSS TTTTT
 
 ## Uso Rápido
 
-### Python
+### Python - Básico
 
 ```python
 from cli_banners import generate_text, generate_shape
@@ -73,6 +81,27 @@ print(arrow)
 # Con color
 banner_colored = generate_text("SUCCESS", style="block", color="green")
 print(banner_colored)
+```
+
+### Python - Alfabeto Extendido
+
+```python
+# Usar el módulo de alfabeto completo
+from alphabet import render_text, list_characters, STYLE_INFO
+
+# Ver estilos disponibles
+for name, info in STYLE_INFO.items():
+    print(f"{name}: {info['description']}")
+
+# Renderizar con diferentes estilos
+print(render_text("HELLO", style="block", color="cyan"))
+print(render_text("WORLD", style="slim", color="green"))
+print(render_text("TEST", style="mini", color="yellow"))
+print(render_text("ABC123", style="simple"))  # ASCII puro
+
+# Ver caracteres disponibles
+chars = list_characters('block')
+print(f"Disponibles: {' '.join(chars)}")
 ```
 
 ### Bash
@@ -137,7 +166,7 @@ Aplica color ANSI a texto.
 
 ## Estilos de Texto
 
-### Block Style
+### Block Style (6 líneas - Recomendado)
 ```
 ██████╗ ██╗      ██████╗  ██████╗██╗  ██╗
 ██╔══██╗██║     ██╔═══██╗██╔════╝██║ ██╔╝
@@ -147,25 +176,35 @@ Aplica color ANSI a texto.
 ╚═════╝ ╚══════╝ ╚═════╝  ╚═════╝╚═╝  ╚═╝
 ```
 
-### Box Style
+### Slim Style (5 líneas)
 ```
-╔═╗╦  ╔═╗╔═╗╔╗╔╔╦╗
-║╣ ║  ║╣ ║ ╦╠╩╗║║║
-╚═╝╩═╝╚═╝╚═╝╚═╝╝╚╝
+  ▄▄    █▀▀▄  ▄▄▄ 
+ █▀▀█   █▀▀▄ █    
+ █▄▄█   █▄▄▀ █    
+ █  █   █     ▀▀▀ 
 ```
 
-### Minimal Style
+### Mini Style (3 líneas - Compacto)
+```
+▄█▄ ██▄ ▄█▀ 
+█▀█ █▄█ █   
+▀ ▀ ▀▀  ▀█▄ 
+```
+
+### Simple Style (ASCII puro)
+```
+  /\   |==\  ___ 
+ /  \  |   )/    
+/----\ |==< |    
+|    | |   )\    
+       |==/  --- 
+```
+
+### Minimal Style (3 líneas)
 ```
 ┌─┐┬  ┌─┐┌─┐┌┐┌
 │  │  ├┤ ├─┤│││
 └─┘┴─┘└─┘┴ ┴┘└┘
-```
-
-### Shadow Style
-```
-░█▀▀░█░░░█▀▀░█▀▀░█▀█░▀█▀
-░█░░░█░░░█▀▀░█▀█░█░█░░█░
-░▀▀▀░▀▀▀░▀▀▀░▀░▀░▀░▀░░▀░
 ```
 
 ## Shapes Disponibles
