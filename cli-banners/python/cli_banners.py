@@ -21,7 +21,8 @@ Usage:
 """
 
 import sys
-from typing import Optional, Dict, List, Tuple
+import time
+from typing import Optional, Dict, List, Tuple, Callable
 
 # Try to import extended alphabet
 try:
@@ -308,6 +309,243 @@ def get_available_characters(style: str = 'block') -> List[str]:
 def get_available_shapes() -> List[str]:
     """Return list of available shapes."""
     return list(SHAPES.keys())
+
+
+# =============================================================================
+# ANIMATION FUNCTIONS
+# =============================================================================
+
+def animate_typewriter(
+    text: str,
+    delay: float = 0.05,
+    color: Optional[str] = None
+) -> None:
+    """
+    Animate text with typewriter effect (character by character).
+    
+    Args:
+        text: Text to animate
+        delay: Delay between characters in seconds
+        color: Optional color to apply
+    
+    Example:
+        >>> animate_typewriter("Loading...", delay=0.1)
+    """
+    if color:
+        text = colorize(text, color)
+    
+    for char in text:
+        sys.stdout.write(char)
+        sys.stdout.flush()
+        time.sleep(delay)
+    
+    print()  # New line after animation
+
+
+def animate_fade_in(
+    text: str,
+    line_delay: float = 0.1,
+    color: Optional[str] = None
+) -> None:
+    """
+    Animate banner with fade-in effect (line by line).
+    
+    Args:
+        text: Multi-line text/banner to animate
+        line_delay: Delay between lines in seconds
+        color: Optional color to apply
+    
+    Example:
+        >>> banner = generate_text("HELLO", style="block")
+        >>> animate_fade_in(banner, line_delay=0.2)
+    """
+    lines = text.split('\n')
+    
+    for line in lines:
+        if color:
+            line = colorize(line, color)
+        print(line)
+        time.sleep(line_delay)
+
+
+def animate_bounce(
+    text: str,
+    bounce_count: int = 2,
+    delay: float = 0.1,
+    color: Optional[str] = None
+) -> None:
+    """
+    Animate banner with bounce effect.
+    
+    Args:
+        text: Text to animate
+        bounce_count: Number of bounces
+        delay: Delay between bounces
+        color: Optional color
+    
+    Example:
+        >>> banner = generate_text("SUCCESS", style="block")
+        >>> animate_bounce(banner, bounce_count=3)
+    """
+    lines = text.split('\n')
+    
+    for bounce in range(bounce_count):
+        # Clear previous lines on bounce (except first)
+        if bounce > 0:
+            for _ in lines:
+                sys.stdout.write('\033[A\033[K')  # Move up and clear
+        
+        # Print with color
+        output = text
+        if color:
+            output = colorize(output, color)
+        print(output)
+        
+        time.sleep(delay)
+
+
+def animate_spinner_loading(
+    text: str = "Loading",
+    frames: Optional[List[str]] = None,
+    duration: float = 2.0,
+    color: Optional[str] = None
+) -> None:
+    """
+    Animate text with spinning cursor.
+    
+    Args:
+        text: Text to display
+        frames: Custom spinner frames (default: ◐ ◓ ◑ ◒)
+        duration: Total animation duration in seconds
+        color: Optional color
+    
+    Example:
+        >>> animate_spinner_loading("Processing", duration=3.0, color="cyan")
+    """
+    if frames is None:
+        frames = ['◐', '◓', '◑', '◒']
+    
+    start_time = time.time()
+    frame_idx = 0
+    
+    while time.time() - start_time < duration:
+        frame = frames[frame_idx % len(frames)]
+        output = f"{frame} {text}"
+        
+        if color:
+            output = colorize(output, color)
+        
+        sys.stdout.write(f'\r{output}')
+        sys.stdout.flush()
+        
+        time.sleep(0.1)
+        frame_idx += 1
+    
+    # Clear the line
+    sys.stdout.write('\r' + ' ' * (len(text) + 4) + '\r')
+    sys.stdout.flush()
+
+
+# =============================================================================
+# INTERACTIVE BANNER GENERATOR
+# =============================================================================
+
+def interactive_banner(
+    text: str,
+    use_questionary: bool = True
+) -> None:
+    """
+    Create banner interactively with style and animation selection.
+    
+    Args:
+        text: Text to display in banner
+        use_questionary: Use questionary for prompts (requires cli-prompts skill)
+    
+    Example:
+        >>> interactive_banner("WELCOME")
+    """
+    
+    # Try to use questionary for better UX
+    if use_questionary:
+        try:
+            import questionary
+            
+            # Ask for style
+            style = questionary.select(
+                "🎨 Select banner style:",
+                choices=get_available_styles(),
+                default='block'
+            ).ask()
+            
+            # Ask for color
+            colors_list = [
+                'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
+                'bright_red', 'bright_green', 'bright_yellow', 'bright_blue',
+                'bright_magenta', 'bright_cyan', 'bright_white', 'none'
+            ]
+            color = questionary.select(
+                "🎨 Select color:",
+                choices=colors_list,
+                default='cyan'
+            ).ask()
+            
+            if color == 'none':
+                color = None
+            
+            # Ask for animation
+            animations = [
+                ('none', 'No animation - instant display'),
+                ('typewriter', 'Typewriter effect'),
+                ('fade_in', 'Fade in line by line'),
+                ('bounce', 'Bounce effect'),
+                ('spinner', 'Spinner loading animation')
+            ]
+            
+            animation = questionary.select(
+                "✨ Select animation:",
+                choices=[f"{name}: {desc}" for name, desc in animations],
+                default='none'
+            ).ask()
+            
+            # Extract animation name
+            animation = animation.split(':')[0].strip()
+            
+        except ImportError:
+            print("⚠️  questionary not available, using simple prompts")
+            use_questionary = False
+    
+    # Fallback to simple input
+    if not use_questionary:
+        print("\n🎨 Available Styles:", ", ".join(get_available_styles()))
+        style = input("Select style [block]: ").strip() or 'block'
+        
+        print("\n🎨 Available Colors: red, green, yellow, blue, cyan, white, none")
+        color_input = input("Select color [cyan]: ").strip() or 'cyan'
+        color = None if color_input == 'none' else color_input
+        
+        print("\n✨ Available Animations: none, typewriter, fade_in, bounce, spinner")
+        animation = input("Select animation [none]: ").strip() or 'none'
+    
+    # Generate banner
+    banner = generate_text(text, style=style, color=color)
+    
+    # Apply animation
+    print()  # Spacing
+    
+    if animation == 'none':
+        print(banner)
+    elif animation == 'typewriter':
+        animate_typewriter(banner, delay=0.02, color=None)  # Color already in banner
+    elif animation == 'fade_in':
+        animate_fade_in(banner, line_delay=0.1, color=None)
+    elif animation == 'bounce':
+        animate_bounce(banner, bounce_count=2, delay=0.15, color=None)
+    elif animation == 'spinner':
+        # Show spinner while displaying
+        animate_spinner_loading(f"Generating {text}", duration=1.5)
+        print(banner)
+    
+    print()  # Final spacing
 
 
 def demo():

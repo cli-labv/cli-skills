@@ -83,6 +83,46 @@ banner_colored = generate_text("SUCCESS", style="block", color="green")
 print(banner_colored)
 ```
 
+### Python - Modo Interactivo (NUEVO! ✨)
+
+```python
+from cli_banners import interactive_banner
+
+# Solicita al usuario: estilo, color y animación
+interactive_banner("WELCOME")
+```
+
+**Preguntas que hace:**
+- 🎨 Seleccionar estilo: block, slim, mini, simple, minimal
+- 🎨 Seleccionar color: red, green, cyan, yellow, magenta, white, etc.
+- ✨ Seleccionar animación: none, typewriter, fade_in, bounce, spinner
+
+### Python - Animaciones
+
+```python
+from cli_banners import (
+    generate_text,
+    animate_typewriter,
+    animate_fade_in,
+    animate_bounce,
+    animate_spinner_loading
+)
+
+banner = generate_text("HELLO", style="block", color="cyan")
+
+# Efecto typewriter (carácter por carácter)
+animate_typewriter(banner, delay=0.05)
+
+# Fade in (línea por línea)
+animate_fade_in(banner, line_delay=0.1)
+
+# Bounce (efecto rebote)
+animate_bounce(banner, bounce_count=2, delay=0.15)
+
+# Spinner (animación de carga)
+animate_spinner_loading("Loading", duration=2.0, color="yellow")
+```
+
 ### Python - Alfabeto Extendido
 
 ```python
@@ -136,6 +176,52 @@ Genera texto en ASCII art con el estilo especificado.
 ```python
 generate_text("CLI", style="block", color="cyan")
 ```
+
+### Animaciones (NUEVO! ✨)
+
+#### `animate_typewriter(text, delay=0.05, color=None)`
+Anima el banner con efecto máquina de escribir.
+
+```python
+banner = generate_text("HELLO", style="block")
+animate_typewriter(banner, delay=0.02)
+```
+
+#### `animate_fade_in(text, line_delay=0.1, color=None)`
+Anima el banner línea por línea.
+
+```python
+animate_fade_in(banner, line_delay=0.15)
+```
+
+#### `animate_bounce(text, bounce_count=2, delay=0.1, color=None)`
+Anima el banner con efecto rebote.
+
+```python
+animate_bounce(banner, bounce_count=3, delay=0.2)
+```
+
+#### `animate_spinner_loading(text="Loading", frames=None, duration=2.0, color=None)`
+Muestra un spinner animado.
+
+```python
+animate_spinner_loading("Processing", duration=2.0, color="cyan")
+```
+
+### Modo Interactivo (NUEVO! ✨)
+
+#### `interactive_banner(text, use_questionary=True)`
+Genera banner con selección interactiva de estilo, color y animación.
+
+```python
+# Pregunta al usuario qué opciones quiere
+interactive_banner("WELCOME")
+```
+
+**Características:**
+- 🎨 Selecciona estilo: block, slim, mini, simple
+- 🎨 Selecciona color: red, green, cyan, yellow, magenta, etc.
+- ✨ Selecciona animación: typewriter, fade_in, bounce, spinner, none
 
 ### Generación de Shapes
 
@@ -241,44 +327,52 @@ Aplica color ANSI a texto.
 
 ### 1. Banner de Bienvenida
 ```python
-from cli_banners import generate_text
+from cli_banners import generate_text, animate_fade_in
 
 banner = generate_text("MYAPP", style="block", color="cyan")
-print(banner)
+animate_fade_in(banner, line_delay=0.1)
 print("  Version 1.0.0 - Production Ready\n")
 ```
 
 ### 2. Mensajes de Estado
 ```python
-from cli_banners import generate_shape
+from cli_banners import generate_shape, animate_typewriter
 
 success = generate_shape("check", color="green")
 error = generate_shape("cross", color="red")
-loading = generate_shape("spinner", style="animated")
 
 print(f"{success} Deployment successful")
 print(f"{error} Connection failed")
-print(f"{loading} Processing...")
+
+# Animado
+animate_typewriter("✅ Processing completed!", delay=0.05, color="green")
 ```
 
 ### 3. Headers de Sección
 ```python
-title = generate_text("CONFIGURATION", style="minimal")
-print(title)
+from cli_banners import generate_text, animate_bounce
+
+title = generate_text("CONFIGURATION", style="minimal", color="blue")
+animate_bounce(title, bounce_count=1)
 print("─" * 50)
 ```
 
-### 4. CLI Interactivos
+### 4. CLI Interactivos con Animaciones
 ```python
-from cli_banners import generate_shape, generate_text
+from cli_banners import interactive_banner
 
-menu_title = generate_text("MENU", style="box")
-arrow = generate_shape("arrow_right", size="small")
+# El usuario selecciona estilo, color y animación
+interactive_banner("MENU")
+```
 
-print(menu_title)
-print(f"{arrow} Option 1")
-print(f"{arrow} Option 2")
-print(f"{arrow} Option 3")
+### 5. Carga con Spinner
+```python
+from cli_banners import animate_spinner_loading, generate_text
+
+animate_spinner_loading("Initializing system", duration=2.0, color="cyan")
+
+banner = generate_text("READY", style="block", color="green")
+print(banner)
 ```
 
 ## Integración con Otros Proyectos
@@ -306,7 +400,9 @@ echo "Starting deployment process..."
 ✅ **Sin dependencias**: No requiere figlet, toilet, ni otros paquetes  
 ✅ **Reproducible**: Mismo resultado en cualquier entorno  
 ✅ **Personalizable**: Estilos y colores configurables  
-✅ **Ligero**: ~500 líneas de código puro  
+✅ **Animaciones**: Typewriter, fade-in, bounce, spinner  
+✅ **Interactivo**: Selecciona estilo, color y animación (con questionary)  
+✅ **Ligero**: ~1000 líneas de código puro  
 ✅ **Profesional**: Calidad de herramientas comerciales  
 ✅ **Integrable**: Funciona con otras skills  
 
@@ -333,10 +429,11 @@ Ver la carpeta `examples/` para casos de uso completos.
 
 ## Roadmap
 
-### Versión 1.1
-- [ ] Más estilos de fuentes (3D, bubble, etc.)
-- [ ] Generador de logos simples
-- [ ] Animaciones de texto
+### Versión 1.1 (NUEVA! ✨)
+- [x] Animaciones de texto (typewriter, fade-in, bounce, spinner)
+- [x] Modo interactivo con questionary
+- [x] Selector de estilo y color
+- [x] Selección de tipo de animación
 
 ### Versión 2.0
 - [ ] Soporte de gradientes RGB
