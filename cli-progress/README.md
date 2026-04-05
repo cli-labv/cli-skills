@@ -1,8 +1,16 @@
 # CLI Progress ⏳
 
-Beautiful progress indicators for Python CLI applications.
+Modern progress indicators for Python CLI applications, powered by **alive-progress**.
 
-A wrapper around [rich.progress](https://rich.readthedocs.io/en/latest/progress.html) providing spinners, progress bars, and task tracking with a simple API.
+This skill provides beautiful spinners, progress bars, and task tracking with a simple, Pythonic API. The primary library is **alive-progress**, which offers:
+
+- 🎯 **Dynamic spinners** that react to your actual processing speed
+- ⏱️ **Accurate ETA** with Exponential Smoothing Algorithm
+- 📊 **Multiple bar styles** and theme combinations
+- 🎨 **Highly customizable** animations and appearances
+- 🪝 **Auto hooks** for print() and logging integration
+- ⏸️ **Pause mechanism** to pause/resume processing
+- 📱 **Multi-mode operation** (auto, unknown, manual percentage)
 
 ## Table of Contents
 
@@ -10,156 +18,240 @@ A wrapper around [rich.progress](https://rich.readthedocs.io/en/latest/progress.
 - [Quick Start](#quick-start)
 - [Spinners](#spinners)
 - [Progress Bars](#progress-bars)
-- [Track Iterables](#track-iterables)
+- [Auto-Tracking Iterators](#auto-tracking-iterators)
+- [Manual Mode (Percentage)](#manual-mode-percentage)
+- [Download Progress](#download-progress)
 - [Multiple Tasks](#multiple-tasks)
 - [Utilities](#utilities)
+- [Advanced Features](#advanced-features)
 - [API Reference](#api-reference)
 
 ## Installation
 
 ```bash
+pip install alive-progress
+# Optional fallback:
 pip install rich
 ```
+
+The skill uses `alive-progress` by default with automatic fallback to `rich` if needed.
 
 ## Quick Start
 
 ```python
-from skills.cli_progress import spinner, track
+from skills.cli_progress import spinner, progress, track
 
-# Spinner for indeterminate operations
+# 1. Spinner - for indeterminate tasks
 with spinner("Loading..."):
-    do_something_slow()
+    long_operation()
 
-# Progress bar for iterables
+# 2. Progress bar - for known totals
+with progress(100, "Downloading") as bar:
+    for item in items:
+        bar()  # increment counter
+
+# 3. Auto-tracking iterator - simplest!
 for item in track(items, "Processing"):
     process(item)
 ```
 
 ## Spinners
 
-For operations with unknown duration:
+For operations with unknown duration. The spinner dynamically reacts to your actual processing speed!
 
 ```python
-from skills.cli_progress import spinner, Spinner
+from skills.cli_progress import spinner
 
 # Simple spinner
 with spinner("Connecting..."):
     connect_to_server()
 
-# With success/failure messages
-with spinner("Downloading...", success_message="Done!"):
-    download_file()
+# With custom style
+with spinner("Loading...", style="dots_waves"):
+    load_data()
 
-# Update message during operation
-with spinner("Starting...") as s:
-    s.update("Connecting to database...")
+# With custom spinner and update text during operation
+with spinner("Starting...", style="earth") as bar:
+    bar.text("Phase 1: Connecting...")
     connect()
-    s.update("Loading config...")
+    bar.text("Phase 2: Loading...")
     load()
-    s.succeed("Ready!")
-
-# Manual control
-s = Spinner("Working...")
-s.start()
-try:
-    do_work()
-    s.succeed("Complete!")
-except Exception:
-    s.fail("Failed!")
 ```
 
-### Spinner Styles
+### Available Spinner Styles
+
+Common styles:
+- **dots** - Animated dots (⠋⠙⠹⠸⠼⠴)
+- **dots_waves** - Dotted wave animation
+- **dots_waves2** - Alternative dotted waves
+- **dots_jumping** - Bouncing dots
+- **dots_sawing** - Sawtooth wave
+- **line** - Line spinner (-\|/)
+- **line_waves** - Animated line waves
+- **circle** - Rotating circle (◡⊙◠)
+- **circle_quarters** - Quarter circles
+- **arc** - Arc spinner
+- **arrow** - Arrow spinner
+- **bounce** / **bouncing** - Bouncing animation
+- **clock** - Clock animation (🕐🕑🕒...)
+- **moon** - Moon phases (🌑🌒🌓🌔)
+- **ruler** - Ruler animation
+- **earth** - Rotating earth (🌍🌎🌏)
+- **hearts** - Heart animation (💛💙💜💚)
+- **triangles** - Triangle animation
+- **classic** - Classic minimal spinner
+
+See all available spinners:
 
 ```python
-# Available styles
-with spinner("Loading...", style="dots"):    # ⠋⠙⠹⠸⠼⠴
-with spinner("Loading...", style="line"):    # -\|/
-with spinner("Loading...", style="moon"):    # 🌑🌒🌓🌔
-with spinner("Loading...", style="clock"):   # 🕐🕑🕒...
-with spinner("Loading...", style="earth"):   # 🌍🌎🌏
-with spinner("Loading...", style="hearts"):  # 💛💙💜💚
-```
+from skills.cli_progress import show_all_spinners
 
-### Spinner Colors
-
-```python
-with spinner("Loading...", color="cyan"):
-with spinner("Loading...", color="green"):
-with spinner("Loading...", color="yellow"):
-with spinner("Loading...", color="red"):
+show_all_spinners()
+show_all_spinners(pattern='wave')  # Filter by pattern
 ```
 
 ## Progress Bars
 
-For operations with known total:
+For operations with a known total. The bar shows percentage, ETA, and throughput.
 
 ```python
-from skills.cli_progress import progress, ProgressBar
+from skills.cli_progress import progress
 
-# Context manager
-with progress(100, "Installing") as pb:
+# Basic usage
+with progress(100, "Processing") as bar:
     for i in range(100):
-        install_package(i)
-        pb.advance()
+        process_item(i)
+        bar()  # increment by 1
 
-# Update description
-with progress(len(files), "Processing") as pb:
-    for f in files:
-        pb.update(description=f"Processing {f}")
-        process(f)
-        pb.advance()
+# With custom increments
+with progress(len(files), "Downloading") as bar:
+    for file in files:
+        size = download(file)
+        bar(size)  # increment by size
 
-# Manual control
-pb = ProgressBar(total=100, description="Loading")
-pb.start()
-for i in range(100):
-    pb.advance()
-pb.stop()
+# With custom spinner style
+with progress(
+    1000,
+    "Computing",
+    spinner="dots_jumping",
+    show_speed=True,
+) as bar:
+    for _ in range(1000):
+        compute()
+        bar()
+
+# Calibrate animation speed if it feels too slow/fast
+with progress(500, "Processing", calibrate=250) as bar:
+    for item in items:
+        bar()
 ```
 
-## Track Iterables
+### Features
 
-The easiest way to show progress:
+- ✅ **Accurate ETA** - Uses exponential smoothing algorithm
+- ✅ **Throughput tracking** - Items per second
+- ✅ **Over/underflow detection** - Shows if you're ahead/behind
+- ✅ **Over/underflow detection** - Shows if you're ahead/behind
+- ✅ **Auto print hooks** - Seamlessly integrate print() calls
+- ✅ **Auto logging hooks** - Integrate with Python logging
+
+## Auto-Tracking Iterators
+
+The easiest way to track progress! No manual bar() calls needed.
 
 ```python
-from skills.cli_progress import track, track_download
+from skills.cli_progress import track
 
-# Basic tracking
+# Just wrap your iterable
 for item in track(items, "Processing"):
     process(item)
+
+# Works with any iterable
+for line in track(open("file.txt"), "Reading"):
+    parse(line)
 
 # With list comprehension
 results = [process(x) for x in track(data, "Computing")]
 
-# Download progress (shows speed and size)
-for chunk in track_download(response.iter_content(), total=file_size):
-    file.write(chunk)
-
-# Transient (removes bar when done)
-for x in track(items, "Quick task", transient=True):
-    process(x)
+# Transient mode (removes bar when done)
+for item in track(items, "Quick task", transient=True):
+    do_quick_work(item)
 ```
+
+The tracker automatically:
+- Infers total from sequence length
+- Shows accurate ETA
+- Shows throughput
+- Requires no manual calls
+
+## Manual Mode (Percentage)
+
+When you only have percentage feedback (not item count):
+
+```python
+from skills.cli_progress import manual_progress
+
+# Set percentage directly (0.0 to 1.0)
+with manual_progress("Installing packages") as bar:
+    bar(0.25)  # 25%
+    bar(0.50)  # 50%
+    bar(0.75)  # 75%
+    bar(1.0)   # 100% - Complete!
+
+# Perfect for monitoring external processes
+def monitor_external_process():
+    with manual_progress("Building Docker image") as bar:
+        process = start_docker_build()
+        while process.running:
+            progress = get_progress_from_stderr(process)
+            bar(progress)  # progress is 0.0-1.0
+```
+
+## Download Progress
+
+Track file downloads with speed and size information:
+
+```python
+from skills.cli_progress import track_download
+
+# Download with progress
+response = requests.get(url, stream=True)
+total_size = int(response.headers.get('content-length', 0))
+
+with open('file.bin', 'wb') as f:
+    for chunk in track_download(
+        response.iter_content(chunk_size=8192),
+        total_size,
+        "Downloading file"
+    ):
+        f.write(chunk)
+```
+
+Shows:
+- Progress bar
+- Downloaded size
+- Download speed
+- Estimated time remaining
 
 ## Multiple Tasks
 
-Track multiple operations simultaneously:
+Track multiple operations (with limitations in alive-progress):
 
 ```python
 from skills.cli_progress import TaskGroup
 
-with TaskGroup() as group:
-    # Add tasks
-    download = group.add_task("Downloading", total=100)
-    process = group.add_task("Processing", total=100)
-    
+group = TaskGroup("Batch Operations")
+task1 = group.add_task("Download", total=100)
+task2 = group.add_task("Process", total=100)
+
+with group.run():
     for i in range(100):
-        # Download step
-        group.advance(download)
-        
-        # Process every other item
-        if i % 2 == 0:
-            group.advance(process, 2)
+        group.update(task1, 1)
+        process()
+        group.update(task2, 1)
 ```
+
+Note: For multiple simultaneous bars, alive-progress is still working on this feature (most requested). Currently shows the primary task.
 
 ## Utilities
 
@@ -168,73 +260,182 @@ with TaskGroup() as group:
 ```python
 from skills.cli_progress import countdown
 
+# Simple countdown
 countdown(5, "Deploying in {remaining}s...")
-deploy()
 
 # With completion message
-countdown(3, "Starting in {remaining}...", on_complete="Go!")
+countdown(3, "Server restart in {remaining}...", on_complete="Ready!")
+
+# Custom message
+countdown(10, "Resume in {remaining} seconds")
 ```
 
-### Status Context
+### View All Animations
 
 ```python
-from skills.cli_progress import status
+from skills.cli_progress import show_all_spinners, show_all_bars, show_all_themes
 
-with status("Connecting..."):
-    connect()
+# Show all spinner styles
+show_all_spinners()
+
+# Show all bar styles
+show_all_bars()
+
+# Show all theme combinations
+show_all_themes()
+
+# Filter by pattern
+show_all_spinners(pattern='wave')
+show_all_bars(pattern='block')
+```
+
+## Advanced Features
+
+### Pause Mechanism
+
+*This feature is unique to alive-progress!*
+
+Pause progress, handle items manually, then resume:
+
+```python
+def reconcile_transactions():
+    with progress(qs.count()) as bar:
+        for transaction in qs:
+            if faulty(transaction):
+                with bar.pause():
+                    yield transaction  # Back to prompt!
+            bar()
+
+# In your REPL
+gen = reconcile_transactions()
+tx = next(gen, None)  # Process pauses at fault
+# Inspect and fix the transaction manually
+next(gen, None)  # Resume
+```
+
+### Over/Underflow Detection
+
+```python
+with progress(100, "Items") as bar:
+    for _ in range(100):
+        bar()  # 100% - perfect
+    
+    # But if we call bar() more times...
+    bar(10)  # Will show as ⚠️ overflow indicator!
+```
+
+### Manual Increments
+
+```python
+with progress(total=1000) as bar:
+    bar()      # Increment by 1
+    bar(5)     # Increment by 5
+    bar(0)     # Don't increment (show current state)
+    bar(-3)    # Decrement by 3 (rare but possible)
+```
+
+### Access Current State
+
+```python
+with progress(100) as bar:
+    for i in range(100):
+        bar()
+        if i % 10 == 0:
+            # Get current information
+            print(f"Monitor: {bar.monitor}")
+            print(f"ETA: {bar.eta}")
+            print(f"Rate: {bar.rate}")
+            print(f"Elapsed: {bar.elapsed}s")
+```
+
+### FPS Calibration
+
+If the spinner feels too slow/fast, adjust the calibration:
+
+```python
+with progress(
+    10000,
+    "Heavy computation",
+    calibrate=5000  # Expects 5000 items/sec as baseline
+) as bar:
+    for item in process_heavy():
+        bar()
 ```
 
 ## API Reference
-
-### Spinner
-
-| Method | Description |
-|--------|-------------|
-| `start()` | Start the spinner |
-| `stop(success=True)` | Stop the spinner |
-| `update(message)` | Update spinner text |
-| `succeed(message)` | Stop with success |
-| `fail(message)` | Stop with failure |
-
-### ProgressBar
-
-| Method | Description |
-|--------|-------------|
-| `start()` | Start the progress bar |
-| `stop()` | Stop the progress bar |
-| `advance(amount=1)` | Increment progress |
-| `update(completed, description, total)` | Update state |
 
 ### Functions
 
 | Function | Description |
 |----------|-------------|
-| `spinner(message, style, color)` | Context manager for spinners |
-| `progress(total, description)` | Context manager for progress bars |
-| `track(iterable, description)` | Progress iterator |
-| `track_download(iterable, total)` | Download progress iterator |
-| `countdown(seconds, message)` | Countdown timer |
-| `status(message)` | Simple status spinner |
+| `spinner(message, style, manual, disable)` | Context manager for spinners |
+| `progress(total, description, show_speed, manual, spinner, calibrate)` | Context manager for progress bars |
+| `manual_progress(description, spinner, calibrate)` | Context manager for percentage-based progress |
+| `track(sequence, description, transient)` | Auto-tracking iterator |
+| `track_download(sequence, total_bytes, description)` | Download progress iterator |
+| `countdown(seconds, message, on_complete)` | Countdown timer |
+| `show_all_spinners(pattern, length, fps)` | Display all spinner styles |
+| `show_all_bars(pattern, length, fps)` | Display all bar styles |
+| `show_all_themes(pattern, length, fps)` | Display all theme combinations |
+
+### Spinner/Progress Context Manager Methods
+
+```python
+with progress(100) as bar:
+    bar()                    # Increment counter by 1
+    bar(5)                   # Increment counter by 5
+    bar.text("Phase 1")      # Update status text
+    bar.title = "New Title"  # Update title
+    value = bar.current      # Get current counter/percentage
+    monitor = bar.monitor    # Get formatted monitor widget
+    eta = bar.eta            # Get formatted ETA widget
+    rate = bar.rate          # Get formatted rate widget
+    elapsed = bar.elapsed    # Get elapsed time in seconds
+    receipt = bar.receipt    # Get final receipt data
+```
 
 ### TaskGroup
 
 | Method | Description |
 |--------|-------------|
-| `add_task(description, total)` | Add a task, returns task name |
-| `advance(task_name, amount)` | Advance a task |
-| `update(task_name, **kwargs)` | Update a task |
+| `add_task(description, total)` | Add a task, returns task ID |
+| `update(task_id, advance)` | Advance a task |
+| `run()` | Context manager to start tracking |
 
 ## Examples
 
-See the `examples/` folder:
+See the `examples/` folder for complete examples:
 
 - `01_basic_progress.py` - Spinners and progress bars
-- `02_multiple_tasks.py` - Concurrent task tracking
-- `03_spinner_styles.py` - All spinner animations
+- `02_manual_mode.py` - Percentage-based progress
+- `03_spinner_showcase.py` - All spinner animations
+- `04_download_example.py` - Download progress tracking
+- `05_pause_mechanism.py` - Pausing and resuming (requires alive-progress)
 
 ## Dependencies
 
-- **rich** - Rich text and progress library
+- **alive-progress** (primary) - Modern progress bars with dynamic animations
+- **rich** (optional fallback) - Beautiful terminal formatting
+
+## Key Differences from Rich
+
+| Feature | alive-progress | rich |
+|---------|---|---|
+| Dynamic spinner speed | ✅ Reacts to throughput | ❌ Static speed |
+| ETA accuracy | ✅ Exponential smoothing | ⚠️ Simple estimation |
+| Pause/Resume | ✅ Unique feature! | ❌ Not available |
+| Print hooks | ✅ Auto-integrated | ⚠️ Manual setup |
+| Manual percentage | ✅ Full support | ⚠️ Complex setup |
+| Multiple bars | ⏳ In development | ✅ Supported |
+
+## Tips for Best Results
+
+1. **Install alive-progress**: `pip install alive-progress` for full features
+2. **Choose appropriate spinner**: Different spinners feel different - experiment!
+3. **Use track()** for simplicity when possible
+4. **Calibrate if needed**: If animation feels off, use `calibrate` parameter
+5. **Force TTY in notebooks**: Use `force_tty=True` in Jupyter
+6. **Check over/underflow**: If your progress looks wrong, check bar() calls
 
 ## License
 

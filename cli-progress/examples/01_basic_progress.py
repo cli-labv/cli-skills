@@ -2,7 +2,7 @@
 """
 Example 1: Basic Progress Indicators
 
-Demonstrates spinners and simple progress bars.
+Demonstrates spinners and simple progress bars using alive-progress.
 """
 
 import time
@@ -10,69 +10,75 @@ from skills.cli_progress import spinner, progress, track
 
 
 def main():
-    print("=" * 50)
-    print("  Basic Progress Indicators")
-    print("=" * 50)
-    print()
+    print("\n" + "=" * 60)
+    print("  Basic Progress Indicators - alive-progress Examples")
+    print("=" * 60)
     
     # 1. Simple spinner
-    print("1. Simple Spinner")
-    print("-" * 40)
+    print("\n1️⃣  Simple Spinner (indeterminate progress)")
+    print("-" * 60)
     
-    with spinner("Connecting to server..."):
+    with spinner("Connecting to server...", style="dots"):
         time.sleep(2)
     
-    print()
+    print("✅ Connected!\n")
     
-    # 2. Spinner with success message
-    print("2. Spinner with completion message")
-    print("-" * 40)
+    # 2. Spinner with different style
+    print("2️⃣  Spinner with custom style (dots_waves)")
+    print("-" * 60)
     
-    with spinner(
-        "Downloading updates...",
-        success_message="Updates downloaded successfully!"
-    ):
+    with spinner("Downloading updates...", style="dots_waves"):
         time.sleep(2)
     
-    print()
+    print("✅ Downloaded!\n")
     
-    # 3. Spinner with update
-    print("3. Spinner with status updates")
-    print("-" * 40)
+    # 3. Spinner with text updates
+    print("3️⃣  Spinner with live updates")
+    print("-" * 60)
     
-    with spinner("Starting process...") as s:
+    with spinner("Processing...", style="earth") as bar:
+        time.sleep(0.5)
+        bar.text("Phase 1: Reading data...")
         time.sleep(1)
-        s.update("Connecting to database...")
+        bar.text("Phase 2: Analyzing...")
         time.sleep(1)
-        s.update("Loading configuration...")
+        bar.text("Phase 3: Writing results...")
         time.sleep(1)
-        s.update("Almost done...")
-        time.sleep(1)
-        s.succeed("Process completed!")
     
-    print()
+    print("✅ Complete!\n")
     
-    # 4. Progress bar with context manager
-    print("4. Progress Bar")
-    print("-" * 40)
+    # 4. Progress bar (deterministic)
+    print("4️⃣  Progress Bar (with known total)")
+    print("-" * 60)
     
-    with progress(100, "Installing packages") as pb:
+    with progress(100, "Installing packages", spinner="dots_jumping") as bar:
         for i in range(100):
-            time.sleep(0.03)
-            pb.advance()
+            time.sleep(0.02)
+            bar()
     
     print()
     
-    # 5. Track iterator
-    print("5. Track Iterator")
-    print("-" * 40)
+    # 5. Track iterator (easiest!)
+    print("5️⃣  Auto-tracking iterator (simplest way!)")
+    print("-" * 60)
     
     items = list(range(50))
     for item in track(items, "Processing files"):
         time.sleep(0.05)
     
     print()
-    print("✅ Demo complete!")
+    
+    # 6. Track with different spinner
+    print("6️⃣  Track with emoji spinner")
+    print("-" * 60)
+    
+    data = range(30)
+    for value in track(data, "Computing values"):
+        time.sleep(0.07)
+    
+    print("\n" + "=" * 60)
+    print("✅ All demos complete!")
+    print("=" * 60 + "\n")
 
 
 if __name__ == "__main__":
@@ -80,4 +86,4 @@ if __name__ == "__main__":
         main()
     except ImportError as e:
         print(f"Error: {e}")
-        print("Install with: pip install rich")
+        print("Install with: pip install alive-progress")
